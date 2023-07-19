@@ -1,20 +1,38 @@
 import { Link } from "react-router-dom";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import { useEffect } from "react";
 import NoDataFound from "../../NoDataFound/NoDataFound";
-
+import { fetchProductsAction } from "../../../redux/slices/products/productSlices";
+import { useDispatch, useSelector } from "react-redux";
+import baseURL from "../../../utils/baseURL";
 export default function ManageStocks() {
-  //Selector
-  let products, loading, error;
-
   //delete product handler
   const deleteProductHandler = (id) => {};
+  //build up url
+
+  let productUrl = `${baseURL}/products`;
+  //dispatch
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(
+      fetchProductsAction({
+        url: productUrl,
+      })
+    );
+  }, [dispatch]);
+  //get data from store
+  const {
+    products: { product },
+    loading,
+    error,
+  } = useSelector((state) => state?.products);
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold text-gray-900">
-            Product List- [{products?.length}]{" "}
+            Product List- [{product?.length}]{" "}
           </h1>
           <p className="mt-2 text-sm text-gray-700">
             List of all the products in your account including their name,
@@ -24,7 +42,8 @@ export default function ManageStocks() {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+          >
             Add New Product
           </button>
         </div>
@@ -34,7 +53,7 @@ export default function ManageStocks() {
         <LoadingComponent />
       ) : error ? (
         <ErrorMsg message={error?.message} />
-      ) : products?.length <= 0 ? (
+      ) : product?.length <= 0 ? (
         <NoDataFound />
       ) : (
         <div className="mt-8 flex flex-col">
@@ -46,57 +65,65 @@ export default function ManageStocks() {
                     <tr>
                       <th
                         scope="col"
-                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                      >
                         Name
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         Category
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         Status
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         Total Qty
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         Total Sold
                       </th>
 
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         QTY Left
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
                         Price
                       </th>
                       <th
                         scope="col"
-                        className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                      >
                         <span className="sr-only">Edit</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
                     {/* loop here */}
-                    {products?.map((product) => (
+                    {product?.map((product) => (
                       <tr key={product._id}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
                               <img
                                 className="h-10 w-10 rounded-full"
-                                src={product?.image}
+                                src={product?.images[0]}
                                 alt={product?.name}
                               />
                             </div>
@@ -119,7 +146,7 @@ export default function ManageStocks() {
                           </div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {product?.isOutOfStock ? (
+                          {product?.qtyLeft <= 0 ? (
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                               Out of Stock
                             </span>
@@ -146,14 +173,16 @@ export default function ManageStocks() {
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <Link
                             to={`/admin/products/edit/${product._id}`}
-                            className="text-indigo-600 hover:text-indigo-900">
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="1.5"
                               stroke="currentColor"
-                              class="w-6 h-6">
+                              class="w-6 h-6"
+                            >
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -168,14 +197,16 @@ export default function ManageStocks() {
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <button
                             onClick={() => deleteProductHandler(product._id)}
-                            className="text-indigo-600 hover:text-indigo-900">
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
                               strokeWidth={1.5}
                               stroke="currentColor"
-                              className="w-6 h-6">
+                              className="w-6 h-6"
+                            >
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"

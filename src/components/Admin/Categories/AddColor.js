@@ -1,8 +1,15 @@
 import { useState } from "react";
 
 import { Link } from "react-router-dom";
+import { createColorAction } from "../../../redux/slices/colors/colorsSlices";
+import { useDispatch, useSelector } from "react-redux";
+import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import ErrorMsg from "../../ErrorMsg/ErrorMsg";
+import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 
 export default function AddColor() {
+  //dispatch
+  const dispatch = useDispatch();
   //form data
   const [formData, setFormData] = useState({
     name: "",
@@ -15,9 +22,23 @@ export default function AddColor() {
   //onSubmit
   const handleOnSubmit = (e) => {
     e.preventDefault();
+    dispatch(
+      createColorAction({
+        name: formData.name,
+      })
+    );
+    //reset form
+    setFormData({
+      name: "",
+    });
   };
+  //get data from store
+  const { error, isAdded, loading } = useSelector((state) => state?.colors);
+
   return (
     <>
+      {isAdded && <SuccessMsg message="Color created successfully" />}
+      {error && <ErrorMsg message={error?.message} />}
       <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <svg
@@ -26,7 +47,8 @@ export default function AddColor() {
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -44,7 +66,8 @@ export default function AddColor() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700">
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Name
                 </label>
                 <div className="mt-1">
@@ -57,11 +80,16 @@ export default function AddColor() {
                 </div>
               </div>
               <div>
-                <button
-                  type="submit"
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  Add Product Color
-                </button>
+                {loading ? (
+                  <LoadingComponent />
+                ) : (
+                  <button
+                    type="submit"
+                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Add Product Color
+                  </button>
+                )}
               </div>
             </form>
 
@@ -79,18 +107,24 @@ export default function AddColor() {
                 <div>
                   <Link
                     to="/admin/add-brand"
-                    className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
+                    className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                  >
                     Add Brand
                   </Link>
                 </div>
 
                 <div>
                   <div>
-                    <Link
-                      to="/admin/add-brand"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
-                      Add Color
-                    </Link>
+                    {loading ? (
+                      LoadingComponent
+                    ) : (
+                      <Link
+                        to="/admin/add-brand"
+                        className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                      >
+                        Add Color
+                      </Link>
+                    )}
                   </div>
                 </div>
 
@@ -98,7 +132,8 @@ export default function AddColor() {
                   <div>
                     <Link
                       to="/admin/add-category"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
+                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                    >
                       Add Category
                     </Link>
                   </div>

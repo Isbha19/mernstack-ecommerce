@@ -1,10 +1,29 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import ErrorComponent from "../../ErrorMsg/ErrorMsg";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  fetchCategoryAction,
+  updateCategoryAction,
+} from "../../../redux/slices/categories/categoriesSlices";
 
 export default function UpdateCategory() {
+  //dispatch
+  const dispatch = useDispatch();
+  //get the id from url
+  const { id } = useParams();
+  useEffect(() => {
+    dispatch(fetchCategoryAction(id));
+  }, [id, dispatch]);
+  //get category from store
+  const { category, loading, error, isUpdated } = useSelector(
+    (state) => state?.categories
+  );
+  const categoryName = category?.category?.name;
+
   //---form data---
   const [formData, setFormData] = useState({
     name: categoryName,
@@ -14,11 +33,16 @@ export default function UpdateCategory() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  let loading, error, isUpdated, categoryName;
-
   //onSubmit
   const handleOnSubmit = (e) => {
     e.preventDefault();
+    console.log(formData);
+    dispatch(
+      updateCategoryAction({
+        id,
+        name: formData,
+      })
+    );
   };
   return (
     <>
@@ -32,7 +56,8 @@ export default function UpdateCategory() {
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -50,7 +75,8 @@ export default function UpdateCategory() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700">
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Name
                 </label>
                 <div className="mt-1">
@@ -68,7 +94,8 @@ export default function UpdateCategory() {
                 ) : (
                   <button
                     type="submit"
-                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
                     Update Category
                   </button>
                 )}
@@ -89,7 +116,8 @@ export default function UpdateCategory() {
                 <div>
                   <Link
                     to="/admin/add-brand"
-                    className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
+                    className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                  >
                     Add Brand
                   </Link>
                 </div>
@@ -98,7 +126,8 @@ export default function UpdateCategory() {
                   <div>
                     <Link
                       to="/admin/add-color"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
+                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                    >
                       Add Color
                     </Link>
                   </div>
@@ -108,7 +137,8 @@ export default function UpdateCategory() {
                   <div>
                     <Link
                       to="/admin/add-category"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
+                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
+                    >
                       Add Category
                     </Link>
                   </div>
